@@ -1,0 +1,10 @@
+{
+  "name": "invenio-homes-v2",
+  "private": true,
+  "type": "module",
+  "description": "Invenio Homes company website (v2 design): static pages in public/, contact form saved by api/contact.js",
+  "engines": { "node": "22.x" },
+  "dependencies": {
+    "@vercel/blob": "2.6.0"
+  }
+}
