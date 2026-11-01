@@ -158,19 +158,47 @@
   });
 })();
 
-/* Live figures (1 Nov 2026): elements with data-stat get today's numbers from /api/stats (portal database, cached a
-   day). Without an answer the figures written in the page stay. */
+/* Live figures (home hero handoff spec, 1 Nov 2026). Elements with data-stat get today's numbers from /api/stats
+   (portal database, cached a day). The page never waits: fallbacks are in the HTML, the request gives up after 2 s,
+   and an implausible value (villas under 500, users under 1) is ignored. No aria-live: updates are silent.
+   The numbers band ([data-count]) counts up once when scrolled into view, unless reduced motion is asked for;
+   its aria-label always carries the final value, so screen readers never hear the intermediate numbers. */
 (function () {
+  var fmt = function (n) { return Number(n).toLocaleString("en-GB"); };
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var MIN = { villas: 500, users: 1 };
+  function countUp(el) {
+    var to = parseInt(String(el.textContent).replace(/[^0-9]/g, ""), 10);
+    if (!to || reduce || !("IntersectionObserver" in window)) return;
+    el.setAttribute("aria-label", fmt(to));
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        var t0 = performance.now(), D = 1200;
+        (function step(t) {
+          var k = Math.min(1, (t - t0) / D), ease = 1 - Math.pow(1 - k, 3);
+          el.textContent = fmt(Math.round(to * ease));
+          if (k < 1) requestAnimationFrame(step); else el.textContent = fmt(to);
+        })(t0);
+      });
+    }, { threshold: 0.4 });
+    io.observe(el);
+  }
   var els = document.querySelectorAll("[data-stat]");
-  if (!els.length || !window.fetch) return;
-  fetch("/api/stats/", { headers: { accept: "application/json" } })
+  function done() { document.querySelectorAll("[data-count]").forEach(countUp); }
+  if (!els.length || !window.fetch) return done();
+  var ctl = window.AbortController ? new AbortController() : null;
+  var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 2000);
+  fetch("/api/stats/", { headers: { accept: "application/json" }, signal: ctl ? ctl.signal : undefined })
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (d) {
       if (!d || !d.ok) return;
       els.forEach(function (el) {
-        var n = d[el.getAttribute("data-stat")];
-        if (typeof n === "number" && n > 0) el.textContent = n.toLocaleString("en-GB");
+        var k = el.getAttribute("data-stat"), n = d[k];
+        if (typeof n === "number" && n >= (MIN[k] || 1)) el.textContent = fmt(n);
       });
     })
-    .catch(function () {});
+    .catch(function (e) { if (window.console) console.info("stats: keeping the figures in the page", e && e.name); })
+    .then(function () { clearTimeout(timer); done(); });
 })();
