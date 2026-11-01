@@ -2073,5 +2073,5 @@ body[data-hero] .site-header:not(.is-stuck) .header-destinations { opacity: 0.82
 .office-map-wrap { margin-top: 22px; aspect-ratio: 16 / 9; border: 1px solid var(--line); overflow: hidden; background: var(--sand); }
 .office-map { display: block; width: 100%; height: 100%; border: 0; filter: grayscale(0.35) sepia(0.12); }
 
-/* Office photo (portrait, from inveniohomes.com): keep the faces in frame when phones crop it to 16:10. */
-.split--office .split__media img { object-position: 50% 30%; }
+/* Office photo (Jacqueline Denise's office shoot, Dec 2022): keep the faces in frame when phones crop it to 16:10. */
+.split--office .split__media img { object-position: 50% 40%; }
