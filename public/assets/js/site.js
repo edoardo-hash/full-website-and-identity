@@ -157,3 +157,20 @@
     });
   });
 })();
+
+/* Live figures (1 Nov 2026): elements with data-stat get today's numbers from /api/stats (portal database, cached a
+   day). Without an answer the figures written in the page stay. */
+(function () {
+  var els = document.querySelectorAll("[data-stat]");
+  if (!els.length || !window.fetch) return;
+  fetch("/api/stats/", { headers: { accept: "application/json" } })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (d) {
+      if (!d || !d.ok) return;
+      els.forEach(function (el) {
+        var n = d[el.getAttribute("data-stat")];
+        if (typeof n === "number" && n > 0) el.textContent = n.toLocaleString("en-GB");
+      });
+    })
+    .catch(function () {});
+})();

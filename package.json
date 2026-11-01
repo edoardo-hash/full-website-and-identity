@@ -3,8 +3,11 @@
   "private": true,
   "type": "module",
   "description": "Invenio Homes company website (v2 design): static pages in public/, contact form saved by api/contact.js",
-  "engines": { "node": "22.x" },
+  "engines": {
+    "node": "22.x"
+  },
   "dependencies": {
-    "@vercel/blob": "2.6.0"
+    "@vercel/blob": "2.6.0",
+    "@neondatabase/serverless": "1.2.0"
   }
 }
