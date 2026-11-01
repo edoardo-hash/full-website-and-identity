@@ -75,5 +75,5 @@ function askPassword(realm: string) {
 
 // The portal is always matched, whatever the path ends with (review 1 Nov 2026: /portal/…/x.json skipped the password).
 export const config = {
-  matcher: ["/portal", "/portal/:path*", "/((?!_next/|portal|favicon|.*\\.(?:svg|jpg|jpeg|png|webp|ico|txt|xml|woff2|woff|css|js|json|webmanifest)$).*)"],
+  matcher: ["/portal", "/portal/:path*", "/((?!_next/|api/|portal|favicon|.*\\.(?:svg|jpg|jpeg|png|webp|ico|txt|xml|woff2|woff|css|js|json|webmanifest)$).*)"],
 };

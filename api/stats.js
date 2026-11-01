@@ -24,7 +24,7 @@ select
        and coalesce(is_internal, false) = false)::int as agents`;
 
 export default async function handler(req, res) {
-  if (!process.env.DATABASE_URL) return res.status(503).json({ ok: false, error: "No database connected" });
+  if (!process.env.DATABASE_URL) return fromSource(res);
   try {
     const [row] = await neon(process.env.DATABASE_URL)(SQL);
     // Never show a broken figure: a zero means the data is missing, not that we have no villas.
@@ -34,5 +34,23 @@ export default async function handler(req, res) {
   } catch (e) {
     console.error("stats:", e instanceof Error ? e.message : e);
     return res.status(503).json({ ok: false, error: "Database unavailable" });
+  }
+}
+
+/**
+ * No database on this project (1 Nov 2026): the same figures come from the sales site, which has the database
+ * (sales/src/app/api/stats). STATS_SOURCE_URL overrides the address.
+ */
+async function fromSource(res) {
+  const url = process.env.STATS_SOURCE_URL || "https://invenio-website-sales.vercel.app/api/stats";
+  try {
+    const r = await fetch(url, { signal: AbortSignal.timeout(5000) });
+    const j = await r.json();
+    if (!r.ok || !j.ok || !j.users || !j.villas) return res.status(503).json({ ok: false, error: "No data" });
+    res.setHeader("Cache-Control", "public, s-maxage=86400, stale-while-revalidate=86400");
+    return res.status(200).json({ ok: true, users: j.users, villas: j.villas, agents: j.agents, at: j.at });
+  } catch (e) {
+    console.error("stats source:", e instanceof Error ? e.message : e);
+    return res.status(503).json({ ok: false, error: "Stats source unavailable" });
   }
 }
