@@ -2045,3 +2045,9 @@ body[data-hero] .site-header:not(.is-stuck) .header-destinations { opacity: 0.82
 
 /* Home: the sales section headline keeps the brand's italic accent. */
 #sales h2 em { color: var(--clay); font-style: italic; }
+
+/* Phones: form controls at 44 px (critique, 1 Nov 2026). */
+@media (max-width: 760px) {
+  .field input, .field select { min-height: 44px; }
+  .check, .check-line { min-height: 44px; align-items: center; }
+}

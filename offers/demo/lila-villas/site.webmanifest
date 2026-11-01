@@ -1,0 +1,19 @@
+{
+  "name": "Lila Villas \u2014 your villa",
+  "short_name": "Lila Villas",
+  "icons": [
+    {
+      "src": "/assets/img/favicon-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/img/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#0e1a2b",
+  "background_color": "#0e1a2b",
+  "display": "standalone"
+}
