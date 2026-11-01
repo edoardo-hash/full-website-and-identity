@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { decodeBasic, roleFromAuthorization, safeEqual, userFromAuthorization } from "@/lib/auth";
+import { PORTAL_LOGIN_URL } from "@/lib/portal-link";
 
 const LOCALES = ["es", "it", "nl"];
 
@@ -12,7 +13,12 @@ const LOCALES = ["es", "it", "nl"];
  */
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  if (pathname === "/portal" || pathname.startsWith("/portal/")) return portal(req);
+  // One portal (Edo, 1 Nov 2026): /portal goes to the Invenio portal sign-in, like every portal link on the company
+  // site. The old staff pages here stay reachable only with PORTAL_LEGACY=1 (and their password) until removed.
+  if (pathname === "/portal" || pathname.startsWith("/portal/")) {
+    if (process.env.PORTAL_LEGACY !== "1") return NextResponse.redirect(PORTAL_LOGIN_URL, 307);
+    return portal(req);
+  }
   // Whole-site lock (Edo, 30 Oct 2026: only he has access to dev): with SITE_PASSWORD set on a branch, every public
   // page asks for it too. The dev branch sets PORTAL_PASSWORD to the same value, so one sign-in covers both.
   const sitePass = process.env.SITE_PASSWORD;

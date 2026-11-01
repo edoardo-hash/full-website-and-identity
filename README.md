@@ -12,7 +12,7 @@ same design system (Cormorant Garamond + Jost, bone / ink / clay, same header, f
 | `offers/demo/` | The two static offer prototypes | invenio-homes-offer, lila-villas-offer | Was `inveniohomes-web` `v2` `af6a227` |
 
 Not included: the rest of the agent portal (`invenio-portal`, portal-dev.invenio.tools), which the live offer pages
-run inside, and the agent sign-in page (invenio-portal-signin.vercel.app).
+run inside, and the agent sign-in page (portal-dev.invenio.tools/login).
 
 No passwords, API keys or database addresses are in this archive. They live in Vercel's environment variables
 (listed below for each site).
@@ -34,7 +34,7 @@ No passwords, API keys or database addresses are in this archive. They live in V
                  Vercel Blob (private JSON)                                       │ reads / writes
                  + optional email (Resend)                                        ▼
                                                                    Neon Postgres (portal database)
-"Agent portal" / "Sign in" links ──► invenio-portal-signin.vercel.app/login/
+"Agent portal" / "Sign in" links ──► portal-dev.invenio.tools/login
 ```
 
 - **Rentals → Sales**: every link marked `data-sales` in `public/**/index.html` (nav "Sales", footer
@@ -103,7 +103,7 @@ trailing slashes, security headers and a one-year cache on `/assets/`. `npm inst
 | Today | Where | Becomes |
 | --- | --- | --- |
 | `https://invenio-sales.vercel.app` | every `data-sales` link | the sales domain (e.g. `https://sales.inveniohomes.com`) |
-| `https://invenio-portal-signin.vercel.app/login/` | every "Go to the Portal" / "Sign in" / "Agents — join us" link (63) | the portal's sign-in address |
+| `https://portal-dev.invenio.tools/login` | every "Go to the Portal" / "Sign in" / "Agents — join us" link (63) | the portal's sign-in address |
 
 ```bash
 grep -rl "invenio-sales.vercel.app" public | xargs sed -i 's#https://invenio-sales.vercel.app#https://sales.inveniohomes.com#g'

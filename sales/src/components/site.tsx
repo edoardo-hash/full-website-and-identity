@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PORTAL_LOGIN_URL } from "@/lib/portal-link";
 import { headers } from "next/headers";
 import type { Listing } from "@/lib/data";
 import type { Dict } from "@/lib/i18n/en";
@@ -138,7 +139,7 @@ export function SiteFooter({ t, lang }: { t: Dict; lang: Lang }) {
               <ul>
                 <li><a href={COMPANY_SITE} target="_blank" rel="noopener">{t.footer.villaRentals}</a></li>
                 <li><a href={`${COMPANY_SITE}/owners/`} target="_blank" rel="noopener">{t.footer.forOwners}</a></li>
-                <li><Link href="/portal">{t.nav.agentSignIn}</Link></li>
+                <li><a href={PORTAL_LOGIN_URL}>{t.nav.agentSignIn}</a></li>
               </ul>
             </div>
             <div className="footer-col">
