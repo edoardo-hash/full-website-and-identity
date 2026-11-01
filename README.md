@@ -334,7 +334,16 @@ Committed 1 Nov 2026, 18:58 CET (17:58 UTC).
 - Reference codes are the first 6 characters of the villa uuid, and the uuid is in rental offer links
   (`/o2/<code>/<uuid>`) and in the portal: anyone holding one can match a V-code to a villa. A separate code (random,
   stored on `villa_sale`) would close it, but references already sent to buyers would change.
-- Netcup database and Invenio (IMpulse mirror) API: the code is ready for a netcup `DATABASE_URL`; the schema on netcup
-  and the mirror API's endpoints still have to be checked before switching.
+- Netcup database and Invenio API (checked on the server, 1 Nov 2026):
+  - netcup Postgres 17, database `invenio`, schemas `impulse`, `invenio`, `ops`, `ai`, `agents`, `people`. It is the
+    source of the villa data (`invenio.villa`, `villa_media`, `villa_amenity`, `price_period`, `booking`…), copied to
+    the portal's Neon database by logical replication (publication `portal_pub`, 33 tables).
+  - The sales tables (`villa_sale`, `villa_sale_status`, `villa_sale_feature`, `sale_*`) and `villa_snapshot` exist
+    **only on Neon** (portal migrations 068–072). Pointing `DATABASE_URL` at netcup today would show no listings and the
+    forms would fail. Options: (a) keep Neon until the switch, when Invenio moves to its own database (the agreed
+    IMpulse migration model); (b) create the sales tables on netcup now and have the portal write there too.
+  - "Invenio API" = the IMpulse mirror on https://data.invenio.tools (`/plapi/getdata/<endpoint>`, IMpulse `api-key` +
+    `bp_uuid` headers): villa list, calendars, booking finance, payments, users. Raw IMpulse data; it has nothing about
+    sales, so the sales site does not need it directly — villa data reaches it through Neon.
 - The company site is English only; the IT / ES / PT-BR / NL pages of today's inveniohomes.com need a decision and
   redirects from the old WordPress addresses before the switch.
