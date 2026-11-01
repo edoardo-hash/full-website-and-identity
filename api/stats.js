@@ -11,16 +11,14 @@ import { neon } from "@neondatabase/serverless";
  *   destination: published now, or unpublished on or after 1 March. The season is the current year's from March,
  *   the previous year's in January and February. (The publish history only starts in Oct 2026, so a villa first
  *   published after September counts too: very few.)
- * - countries: countries our approved external agents work from.
+ * - "51 offers a day" is NOT here: it is written in the page (offers March–September 2026 = 10,833 / 214 days, from
+ *   the IMpulse offers export of 2 Oct 2026; the nightly import keeps only recent offers). Update it by hand each season.
  * - agents: approved external agents (Owners page).
  */
 const SQL = `
 select
   (select count(*) from invenio.portal_user where not discontinued and status in ('active','approvedwn'))::int as users,
   (select count(*) from invenio.villa where published or unpublished_at >= make_date(extract(year from now() - interval '2 months')::int, 3, 1))::int as villas,
-  (select count(distinct lower(trim(country))) from invenio.portal_user
-     where not discontinued and status in ('active','approvedwn') and role ilike '%AGENT%'
-       and coalesce(is_internal, false) = false and nullif(trim(country), '') is not null)::int as countries,
   (select count(*) from invenio.portal_user
      where not discontinued and status in ('active','approvedwn') and role ilike '%AGENT%'
        and coalesce(is_internal, false) = false)::int as agents`;
