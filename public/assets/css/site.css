@@ -2075,3 +2075,12 @@ body[data-hero] .site-header:not(.is-stuck) .header-destinations { opacity: 0.82
 
 /* Office photo (Jacqueline Denise's office shoot, Dec 2022): keep the faces in frame when phones crop it to 16:10. */
 .split--office .split__media img { object-position: 50% 40%; }
+
+/* Phones and tablets: the agents' Portal button stays in the header (Nov 2026). */
+@media (max-width: 1080px) {
+  .site-header .header-actions .btn { display: inline-flex; padding: 11px 14px; letter-spacing: 0.12em; }
+  .header-actions { gap: 4px; }
+}
+@media (max-width: 374px) {
+  .site-header .header-actions .btn { display: none; }
+}
