@@ -2078,9 +2078,9 @@ body[data-hero] .site-header:not(.is-stuck) .header-destinations { opacity: 0.82
 
 /* Phones and tablets: the agents' Portal button stays in the header (Nov 2026). */
 @media (max-width: 1080px) {
-  .site-header .header-actions .btn { display: inline-flex; padding: 11px 14px; letter-spacing: 0.12em; }
+  .site-header .header-actions .btn { display: inline-flex; flex: none; white-space: nowrap; padding: 11px 13px; letter-spacing: 0.1em; }
   .header-actions { gap: 4px; }
 }
-@media (max-width: 374px) {
+@media (max-width: 369px) {
   .site-header .header-actions .btn { display: none; }
 }
