@@ -202,3 +202,25 @@
     .catch(function (e) { if (window.console) console.info("stats: keeping the figures in the page", e && e.name); })
     .then(function () { clearTimeout(timer); done(); });
 })();
+
+/* Teaser popup: home only, once per visitor (again after 14 days); ?teaser=1 always shows it */
+(function () {
+  var dlg = document.querySelector("[data-teaser]");
+  if (!dlg || typeof dlg.showModal !== "function") return;
+  var KEY = "invenio-teaser-v1", DAYS = 14;
+  var force = /[?&]teaser=1\b/.test(location.search);
+  var seen = 0;
+  try { seen = Number(localStorage.getItem(KEY)) || 0; } catch (e) { seen = 0; }
+  if (!force && seen && Date.now() - seen < DAYS * 864e5) return;
+  function remember() { try { localStorage.setItem(KEY, String(Date.now())); } catch (e) { /* storage blocked */ } }
+  function close() { remember(); if (dlg.open) dlg.close(); }
+  dlg.querySelectorAll("[data-teaser-close]").forEach(function (el) { el.addEventListener("click", close); });
+  dlg.addEventListener("cancel", remember);
+  dlg.addEventListener("click", function (e) { if (e.target === dlg) close(); });
+  setTimeout(function () {
+    if (document.body.classList.contains("menu-open")) return;
+    dlg.showModal();
+    var btn = dlg.querySelector(".teaser__close");
+    if (btn) btn.focus();
+  }, force ? 300 : 1400);
+})();
