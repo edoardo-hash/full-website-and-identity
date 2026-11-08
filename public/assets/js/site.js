@@ -207,7 +207,7 @@
 (function () {
   var dlg = document.querySelector("[data-teaser]");
   if (!dlg || typeof dlg.showModal !== "function") return;
-  var KEY = "invenio-teaser-v1", DAYS = 14;
+  var KEY = "invenio-teaser-v2", DAYS = 14;
   var force = /[?&]teaser=1\b/.test(location.search);
   var seen = 0;
   try { seen = Number(localStorage.getItem(KEY)) || 0; } catch (e) { seen = 0; }
