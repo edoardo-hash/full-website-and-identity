@@ -1,13 +1,18 @@
 # Invenio Homes website: company site + sales + client offer pages
 
-One repository for the public Invenio Homes websites and the client offer pages (branch `dev-full-site`, from
-1 November 2026). All use the
+> **This is the definitive repository** for the Invenio Homes public website and the sales site (Edo, 8 Nov 2026,
+> 03:55 CET / 02:55 UTC). Work happens here, on `main`. The older repositories are superseded and should not get new
+> work: `edoardo-hash-invenio-sales` (all of its `main` and `dev` is in `sales/`, up to `1c7a961` of 3 Nov 2026),
+> `Deepseek` and `inveniohomes-web`. The `compare` branch of the old sales repo ("The vein" portal design,
+> invenio-sales-compare) was a design alternative and is not included.
+
+One repository for the public Invenio Homes websites and the client offer pages. All use the
 same design system (Cormorant Garamond + Jost, bone / ink / clay, same header, footer, buttons and forms).
 
 | Folder | Site | Vercel project | Notes |
 | --- | --- | --- | --- |
 | `/` (`public/`, `api/`) | Company site: rentals, agents, owners, destinations | full-website-and-identity | Root directory unchanged, so the existing project keeps deploying it |
-| `sales/` | Sales site: villas for sale, sell your villa, buyer brief, sales portal | a second project with **Root Directory = `sales`** | Was `edoardo-hash/edoardo-hash-invenio-sales` (`dev`, `431a5bb`) |
+| `sales/` | Sales site: villas for sale, sell your villa, buyer brief, sales portal | invenio-website-sales (**Root Directory = `sales`**) | Replaces `edoardo-hash/edoardo-hash-invenio-sales` and its project invenio-sales (invenio-sales.vercel.app) |
 | `offers/portal-o2/` | Client offer pages v2, live data | — (runs inside `invenio-portal`, `src/app/o2/`) | Copy for review, from `invenio-portal` `dev` `bcfc0d0` |
 | `offers/demo/` | The two static offer prototypes | invenio-homes-offer, lila-villas-offer | Was `inveniohomes-web` `v2` `af6a227` |
 

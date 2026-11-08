@@ -104,7 +104,7 @@ export default async function ListingPage({ params, searchParams }: { params: Pa
               <div className="stack" style={{ gap: 8 }}><div className="inline" style={{ justifyContent: "space-between" }}><span>Before publishing</span><b style={{ fontWeight: 500 }}>{d?.publish ?? 0} / {PUBLISH_KEYS.length}</b></div><div className="bar" style={{ width: "100%" }}><span style={{ width: `${((d?.publish ?? 0) / PUBLISH_KEYS.length) * 100}%` }} /></div></div>
               <div className="stack" style={{ gap: 8 }}><div className="inline" style={{ justifyContent: "space-between" }}><span>Before an offer</span><b style={{ fontWeight: 500 }}>{d?.offer ?? 0} / {OFFER_TOTAL}</b></div><div className="bar" style={{ width: "100%" }}><span style={{ width: `${((d?.offer ?? 0) / OFFER_TOTAL) * 100}%` }} /></div></div>
             </div>
-            <p className="small" style={{ padding: "0 22px 18px" }}>Key documents: nota simple {d?.byKey.get("nota_simple") ?? "missing"} · title deed {d?.byKey.get("escritura") ?? "missing"} · signed mandate {d?.byKey.get("mandate") ?? "missing"}.</p>
+            <p className="small" style={{ padding: "0 22px 18px" }}>Signed sale mandate {d?.byKey.get("mandate") ?? "missing"} (needed to publish) · nota simple {d?.byKey.get("nota_simple") ?? "missing"} (due within 14 days of going live) · title deed {d?.byKey.get("escritura") ?? "missing"}.</p>
           </section>
         </div>
 
@@ -155,7 +155,8 @@ export default async function ListingPage({ params, searchParams }: { params: Pa
   );
 }
 
-const KEY_DOCS: [string, string][] = [["nota_simple", "Nota simple"], ["escritura", "Title deed"], ["mandate", "Signed mandate"]];
+/** The one document needed to publish (Edo, 3 Nov 2026): the signed sale mandate. The nota simple follows within 14 days. */
+const KEY_DOCS: [string, string][] = [["mandate", "Signed sale mandate"]];
 const hasDoc = (st: string | undefined) => st === "uploaded" || st === "checked";
 
 /** Admins approve themselves (Edo, 31 Oct 2026). What David's approval checks is listed; missing items ask for "approve anyway". */
@@ -168,6 +169,7 @@ function Approval({ l, keyDocs, error }: { l: Listing; keyDocs: Map<string, stri
     { ok: l.photos.length > 0, label: "Photos" },
   ];
   const missing = checks.filter((c) => !c.ok).map((c) => c.label);
+  const notaSimple = hasDoc(keyDocs.get("nota_simple"));
   const live = l.status === "approved" || l.status === "under_offer";
   const canApprove = l.status === "draft" || l.status === "review";
   return (
@@ -182,6 +184,9 @@ function Approval({ l, keyDocs, error }: { l: Listing; keyDocs: Map<string, stri
             </li>
           ))}
         </ul>
+        {!notaSimple ? (
+          <p className="small">Nota simple: not needed to publish. If it is still missing 14 days after the listing goes live, the villa&apos;s HAM and the Sales Admins get a reminder.</p>
+        ) : null}
         {error === "anyway" ? <p role="alert" style={{ color: "#B4532A" }}>Something is still missing: tick &quot;Approve anyway&quot; to publish it as it is.</p> : null}
         {error === "status" ? <p role="alert" style={{ color: "#B4532A" }}>The status could not be changed. Reload the page and try again.</p> : null}
         {canApprove ? (
