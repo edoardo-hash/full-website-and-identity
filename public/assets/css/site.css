@@ -1009,8 +1009,8 @@ select.filter-select,
   padding-top: 20px;
   border-top: 1px solid var(--line);
 }
-.spec { display: flex; align-items: center; gap: 9px; font-size: 12px; letter-spacing: 0.04em; color: var(--ink-2); }
-.spec svg { width: 17px; height: 17px; color: var(--clay); flex-shrink: 0; }
+.spec { display: flex; align-items: center; gap: 11px; font-size: 16px; letter-spacing: 0.03em; color: var(--ink-2); }
+.spec svg { width: 24px; height: 24px; color: var(--clay); flex-shrink: 0; }
 
 .gallery {
   position: relative;
@@ -1493,8 +1493,9 @@ select.filter-select,
   .gallery__item:nth-child(n + 3) { display: none; }
   .villa-head__area { text-align: left; }
   .villa-head h1 { font-size: clamp(2.4rem, 10vw, 3.6rem); }
-  .spec-bar { gap: 10px 18px; }
-  .spec { font-size: 12px; }
+  .spec-bar { gap: 12px 22px; }
+  .spec { font-size: 14px; gap: 9px; }
+  .spec svg { width: 21px; height: 21px; }
   .amenity-groups { grid-template-columns: 1fr; }
   .fact-grid { grid-template-columns: 1fr 1fr; }
   .booking { padding: 20px; }
@@ -1860,7 +1861,8 @@ body[data-hero] .site-header:not(.is-stuck) .header-destinations { opacity: 0.82
 .home-card__facts { font-size: 13px; color: var(--ink-2); margin-bottom: 4px; }
 .home-card__licence { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--clay); margin-bottom: 14px; }
 .home-card__note { font-size: 13px; line-height: 1.6; color: var(--muted); margin-top: auto; }
-.homes-note { margin-top: 26px; font-size: 12px; color: var(--muted); max-width: 70ch; }
+.homes-note { margin-top: 26px; font-size: 12px; color: var(--muted); }
+.homes-note span { display: block; }
 
 /* Numbers ---------------------------------------------------------------- */
 .numbers-band { background: var(--sea); color: var(--bone); padding-block: clamp(64px, 8vw, 110px); }
