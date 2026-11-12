@@ -8,10 +8,11 @@ import { eur } from "@/lib/rules";
 import { SiteBehaviour } from "./site-behaviour";
 
 /** The rentals site this one is the sales arm of (the v2 company site while it is on Vercel, inveniohomes.com after). */
-export const COMPANY_SITE = process.env.COMPANY_SITE_URL || "https://inveniohomes.com";
+export const COMPANY_SITE = process.env.COMPANY_SITE_URL || "https://full-website-and-identity.vercel.app";
 export const DAVID = { name: "David Ramiro", email: "david@inveniohomes.com", phone: "+34 671 349 592", tel: "tel:+34671349592" };
 export const whatsapp = (text: string) => `https://wa.me/34671349592?text=${encodeURIComponent(text)}`;
-const WA_GENERAL = whatsapp("Hello David, I would like to talk about buying or selling a villa in Ibiza.");
+/** The general WhatsApp link, with the prefilled message in the visitor's language (it was always English). */
+const waGeneral = (t: Dict) => whatsapp(t.home.whatsappText);
 
 export const Arrow = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6" /></svg>
@@ -89,7 +90,7 @@ export async function SiteHeader({ t, lang, current }: { t: Dict; lang: Lang; cu
             <div className="site-menu__contact">
               <a href={`mailto:${DAVID.email}`}>{DAVID.email}</a>
               <a href={DAVID.tel}>{DAVID.phone}</a>
-              <a href={WA_GENERAL} target="_blank" rel="noopener">WhatsApp</a>
+              <a href={waGeneral(t)} target="_blank" rel="noopener">WhatsApp</a>
             </div>
           </div>
           <div>
@@ -122,7 +123,7 @@ export function SiteFooter({ t, lang }: { t: Dict; lang: Lang }) {
             <div className="footer-contact">
               <a href={`mailto:${DAVID.email}`}>{DAVID.email}</a>
               <a href={DAVID.tel}>{DAVID.phone}</a>
-              <a href={WA_GENERAL} target="_blank" rel="noopener">WhatsApp</a>
+              <a href={waGeneral(t)} target="_blank" rel="noopener">WhatsApp</a>
             </div>
           </div>
           <div className="footer-cols">
@@ -146,7 +147,7 @@ export function SiteFooter({ t, lang }: { t: Dict; lang: Lang }) {
               <h4>{t.footer.contact}</h4>
               <ul>
                 <li><a href={`mailto:${DAVID.email}`}>{DAVID.email}</a></li>
-                <li><a href={WA_GENERAL} target="_blank" rel="noopener">{fmt(t.footer.whatsapp, { phone: DAVID.phone })}</a></li>
+                <li><a href={waGeneral(t)} target="_blank" rel="noopener">{fmt(t.footer.whatsapp, { phone: DAVID.phone })}</a></li>
                 <li><span>Ibiza · Formentera</span></li>
               </ul>
             </div>
@@ -265,7 +266,7 @@ export function ExpertCard({ t, lang, text, cta = true }: { t: Dict; lang: Lang;
         {text ? <p className="expert-card__text">{text}</p> : null}
         <div className="expert-card__links">
           <a href={`mailto:${DAVID.email}`}><Icon.mail /> {DAVID.email}</a>
-          <a href={WA_GENERAL} target="_blank" rel="noopener"><Icon.chat /> WhatsApp</a>
+          <a href={waGeneral(t)} target="_blank" rel="noopener"><Icon.chat /> WhatsApp</a>
         </div>
       </div>
       {cta ? <a className="btn btn--ghost" href={`${href(lang, "/properties")}#brief`}>{t.nav.sendBrief}<Arrow /></a> : null}

@@ -44,7 +44,7 @@ No passwords, API keys or database addresses are in this archive. They live in V
 
 - **Rentals → Sales**: every link marked `data-sales` in `public/**/index.html` (nav "Sales", footer
   "Villas for sale", home section "Villas for sale, known from the inside").
-- **Sales → Rentals**: the env var `COMPANY_SITE_URL` (default `https://inveniohomes.com`) drives "Rentals",
+- **Sales → Rentals**: the env var `COMPANY_SITE_URL` (default `https://full-website-and-identity.vercel.app` until the domain is final, then `https://inveniohomes.com`) drives "Rentals",
   "Villa rentals" and "For owners".
 - **Shared design**: `sales/src/app/globals.css` is the rentals stylesheet (`public/assets/css/site.css`)
   copied unchanged, plus an "App additions" section at the end. Fonts and logos are the same files. When the rentals
@@ -108,6 +108,7 @@ trailing slashes, security headers and a one-year cache on `/assets/`. `npm inst
 | Today | Where | Becomes |
 | --- | --- | --- |
 | `https://invenio-website-sales.vercel.app` | every `data-sales` link | the sales domain (e.g. `https://sales.inveniohomes.com`) |
+| `https://full-website-and-identity.vercel.app` | sales site: "Rentals", "Villa rentals", "For owners" (`COMPANY_SITE` in `sales/src/components/site.tsx`, or env `COMPANY_SITE_URL`) | `https://inveniohomes.com` |
 | `https://portal-dev.invenio.tools/login` | every "Go to the Portal" / "Sign in" / "Agents — join us" link (63) | the portal's sign-in address |
 
 ```bash
@@ -190,7 +191,7 @@ Without `DATABASE_URL` every page still renders and says listings can't be shown
 | `PORTAL_PASSWORD` | Yes for `/portal` | Admin password of the staff portal (HTTP Basic auth, any user name). Without it `/portal` is closed. |
 | `PORTAL_AGENT_PASSWORD` | Optional | Password for external sales agents: references only, no villa names. |
 | `SITE_PASSWORD` | Optional | Locks the whole public site (used on a private dev branch). Leave unset for a public site. |
-| `COMPANY_SITE_URL` | Optional | Where "Rentals" links go (default https://inveniohomes.com). |
+| `COMPANY_SITE_URL` | Optional | Where "Rentals" links go (default https://full-website-and-identity.vercel.app until the domain is final). |
 | `AI_TEXT_MODEL`, `AI_TEXT_BASE_URL`, `AI_GATEWAY_API_KEY` | Optional | Translation model (default `deepseek/deepseek-v4-flash` via Vercel AI Gateway; on Vercel the deployment's OIDC token is used, no key needed). |
 | `CASAFARI_API_KEY` | Optional | Casafari comparables in the portal's market check (admins only). |
 
