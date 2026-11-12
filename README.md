@@ -12,7 +12,7 @@ same design system (Cormorant Garamond + Jost, bone / ink / clay, same header, f
 | Folder | Site | Vercel project | Notes |
 | --- | --- | --- | --- |
 | `/` (`public/`, `api/`) | Company site: rentals, agents, owners, destinations | full-website-and-identity | Root directory unchanged, so the existing project keeps deploying it |
-| `sales/` | Sales site: villas for sale, sell your villa, buyer brief, sales portal | invenio-website-sales (**Root Directory = `sales`**) | Replaces `edoardo-hash/edoardo-hash-invenio-sales` and its project invenio-sales (invenio-sales.vercel.app) |
+| `sales/` | Sales site: villas for sale, sell your villa, buyer brief, sales portal | invenio-website-sales (**Root Directory = `sales`**) | Replaces `edoardo-hash/edoardo-hash-invenio-sales` and its project invenio-sales (invenio-website-sales.vercel.app) |
 | `offers/portal-o2/` | Client offer pages v2, live data | — (runs inside `invenio-portal`, `src/app/o2/`) | Copy for review, from `invenio-portal` `dev` `bcfc0d0` |
 | `offers/demo/` | The two static offer prototypes | invenio-homes-offer, lila-villas-offer | Was `inveniohomes-web` `v2` `af6a227` |
 
@@ -107,11 +107,11 @@ trailing slashes, security headers and a one-year cache on `/assets/`. `npm inst
 
 | Today | Where | Becomes |
 | --- | --- | --- |
-| `https://invenio-sales.vercel.app` | every `data-sales` link | the sales domain (e.g. `https://sales.inveniohomes.com`) |
+| `https://invenio-website-sales.vercel.app` | every `data-sales` link | the sales domain (e.g. `https://sales.inveniohomes.com`) |
 | `https://portal-dev.invenio.tools/login` | every "Go to the Portal" / "Sign in" / "Agents — join us" link (63) | the portal's sign-in address |
 
 ```bash
-grep -rl "invenio-sales.vercel.app" public | xargs sed -i 's#https://invenio-sales.vercel.app#https://sales.inveniohomes.com#g'
+grep -rl "invenio-website-sales.vercel.app" public | xargs sed -i 's#https://invenio-website-sales.vercel.app#https://sales.inveniohomes.com#g'
 ```
 
 ---
