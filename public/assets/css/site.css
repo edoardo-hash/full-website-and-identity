@@ -2214,3 +2214,10 @@ body[data-hero] .site-header:not(.is-stuck) .header-destinations { opacity: 0.82
   .wn-track { scroll-behavior: auto; }
   .wn-typing span { animation: none; opacity: 0.6; }
 }
+
+/* What's new: presentation film */
+.wn-film { padding: clamp(8px, 2vw, 24px) 0 clamp(24px, 4vw, 48px); scroll-margin-top: 100px; }
+.wn-film .wrap { max-width: min(1120px, calc(100vw - 2 * var(--gutter))); }
+.wn-film h2 { font-size: clamp(2rem, 3.6vw, 3.4rem); margin: 6px 0 clamp(18px, 2.4vw, 28px); }
+.wn-film__frame { border-radius: 14px; overflow: hidden; background: var(--ink); box-shadow: 0 30px 70px rgba(22, 20, 15, .18); aspect-ratio: 16 / 9; }
+.wn-film__frame video { display: block; width: 100%; height: 100%; object-fit: cover; }
