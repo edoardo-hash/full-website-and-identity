@@ -121,6 +121,9 @@ export function SiteFooter({ t, lang }: { t: Dict; lang: Lang }) {
             <h2 className="footer-headline">{t.footer.headline}</h2>
             <p className="footer-note">{t.footer.note}</p>
             <div className="footer-contact">
+              <a className="footer-address" href="https://www.google.com/maps/search/?api=1&query=C.+San+Lorenzo+y+Molins+de+Rei+12+07840+Santa+Eul%C3%A0ria+des+Riu" target="_blank" rel="noopener">
+                <address>C. San Lorenzo y Molins de Rei, 12<br />07840 Santa Eulària des Riu, Ibiza</address>
+              </a>
               <a href={`mailto:${DAVID.email}`}>{DAVID.email}</a>
               <a href={DAVID.tel}>{DAVID.phone}</a>
               <a href={waGeneral(t)} target="_blank" rel="noopener">WhatsApp</a>
