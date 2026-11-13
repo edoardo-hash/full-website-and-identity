@@ -165,6 +165,12 @@ const LISTING_SQL = `
     left join villa_snapshot s on s.uuid = vs.villa_uuid
    where vs.for_sale`;
 
+/**
+ * Villas only for now, no apartments (Edo, 13 Nov 2026): the portal's villa_sale.property_type (its migration 094),
+ * read through to_jsonb so the query still runs on a database where the column isn't there yet.
+ */
+const VILLAS_ONLY = `coalesce(to_jsonb(vs)->>'property_type', 'villa') = 'villa'`;
+
 export type Loaded<T> = { ok: true; data: T } | { ok: false; reason: "no-db" | "error"; message?: string };
 
 async function load<T>(fn: () => Promise<T>): Promise<Loaded<T>> {
@@ -186,7 +192,7 @@ export const allListings = () => load(async () => withFeatures((await q<Row>(`${
 export const publicListings = () =>
   load(async () =>
     withFeatures(
-      (await q<Row>(`${LISTING_SQL} and vs.status in ('approved', 'under_offer') and not vs.off_market order by vs.asking_price_eur nulls last`))
+      (await q<Row>(`${LISTING_SQL} and vs.status in ('approved', 'under_offer') and not vs.off_market and ${VILLAS_ONLY} order by vs.asking_price_eur nulls last`))
         .map(toListing)
         .filter((l) => l.brand === "IH")
         // The public site never gets villa names: not as fields, not inside the sale text (Edo, 1 Nov 2026).
