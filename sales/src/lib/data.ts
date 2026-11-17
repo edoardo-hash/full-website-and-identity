@@ -156,14 +156,39 @@ async function withFeatures(list: Listing[]): Promise<Listing[]> {
   return list;
 }
 
-const LISTING_SQL = `
-  select s.data as v, vs.villa_uuid::text as uuid, vs.status, vs.asking_price_eur::text as price, vs.price_on_request, vs.negotiable,
+/**
+ * Where the villa's own record (area, photos, counts) is read from. The portal's database has two copies: the netcup
+ * replica's (`dev_src.villa_snapshot`, every villa in IMpulse, refreshed through the day) and the older import
+ * (`public.villa_snapshot`), which doesn't have villas created since or never published for rental — a new property
+ * for sale only showed "Villa in Ibiza" with no photo (Edo, 17 Nov 2026, V-0e4dc5). The replica's copy wins, the import
+ * is the fallback; where the replica isn't there (production) only the import is read. Asked once per server instance.
+ */
+let replica: Promise<boolean> | null = null;
+const hasReplica = () =>
+  (replica ??= q<{ has: boolean }>("select to_regclass('dev_src.villa_snapshot') is not null as has")
+    .then((r) => !!r[0]?.has)
+    .catch(() => false));
+/** The joins and the expression giving one villa's record, for a query whose villa id is `idExpr`. */
+async function villaRecord(idExpr: string): Promise<{ joins: string; data: string }> {
+  return (await hasReplica())
+    ? {
+        joins: `left join dev_src.villa_snapshot vd on vd.uuid = ${idExpr} left join villa_snapshot vp on vp.uuid = ${idExpr}`,
+        data: "coalesce(vd.data, vp.data)",
+      }
+    : { joins: `left join villa_snapshot vp on vp.uuid = ${idExpr}`, data: "vp.data" };
+}
+
+const listingSql = async () => {
+  const v = await villaRecord("vs.villa_uuid");
+  return `
+  select ${v.data} as v, vs.villa_uuid::text as uuid, vs.status, vs.asking_price_eur::text as price, vs.price_on_request, vs.negotiable,
          vs.commission_pct::text, vs.mandate_type, vs.mandate_signed_on::text, vs.mandate_ends_on::text, vs.listing_partner,
          vs.exclusive_agent, vs.off_market, vs.rentable_while_on_sale, vs.website_only, vs.legal_bedrooms, vs.built_m2::text,
          vs.plot_m2::text, vs.cadastral_ref, vs.licence_transferable, vs.public_summary, vs.notes, vs.approved_by, vs.updated_at::text
     from villa_sale vs
-    left join villa_snapshot s on s.uuid = vs.villa_uuid
+    ${v.joins}
    where vs.for_sale`;
+};
 
 /**
  * Villas only for now, no apartments (Edo, 13 Nov 2026): the portal's villa_sale.property_type (its migration 094),
@@ -183,7 +208,7 @@ async function load<T>(fn: () => Promise<T>): Promise<Loaded<T>> {
 }
 
 /** Every listing with the "for sale" switch on (portal view). */
-export const allListings = () => load(async () => withFeatures((await q<Row>(`${LISTING_SQL} order by vs.updated_at desc`)).map(toListing)));
+export const allListings = () => load(async () => withFeatures((await q<Row>(`${await listingSql()} order by vs.updated_at desc`)).map(toListing)));
 
 /**
  * The public site: approved or under offer, not off-market, Invenio Homes brand only
@@ -192,7 +217,7 @@ export const allListings = () => load(async () => withFeatures((await q<Row>(`${
 export const publicListings = () =>
   load(async () =>
     withFeatures(
-      (await q<Row>(`${LISTING_SQL} and vs.status in ('approved', 'under_offer') and not vs.off_market and ${VILLAS_ONLY} order by vs.asking_price_eur nulls last`))
+      (await q<Row>(`${await listingSql()} and vs.status in ('approved', 'under_offer') and not vs.off_market and ${VILLAS_ONLY} order by vs.asking_price_eur nulls last`))
         .map(toListing)
         .filter((l) => l.brand === "IH")
         // The public site never gets villa names: not as fields, not inside the sale text (Edo, 1 Nov 2026).
@@ -245,6 +270,7 @@ export const sheetVillaByRef = (ref: string) =>
   load(async () => {
     const m = /^v-([0-9a-f]{6})$/i.exec(decodeURIComponent(ref).trim());
     if (!m) return null;
+    const v = await villaRecord("s.villa_uuid");
     const rows = await q<{
       uuid: string; invenio_name: string | null; real_name: string | null; area: string | null; bedrooms: number | null; bathrooms: number | null;
       price: string | null; negotiable: boolean | null; exclusive_agent: string | null; off_market: boolean | null; rentable_while_on_sale: boolean | null;
@@ -254,8 +280,8 @@ export const sheetVillaByRef = (ref: string) =>
       `select s.villa_uuid::text as uuid, s.unique_name as invenio_name, s.villa_name as real_name, s.area, s.bedrooms, s.bathrooms,
               coalesce(s.confirmed_price_eur, s.price_for_portal_eur, s.current_price_eur)::text as price, s.negotiable, s.exclusive_agent,
               s.off_market, s.rentable_while_on_sale, s.still_for_sale, s.ham_name, s.sales_contact, s.sales_contact_email, s.action, s.notes,
-              v.data->'photos' as photos, exists (select 1 from villa_sale x where x.villa_uuid = s.villa_uuid) as has_listing
-         from villa_sale_status s left join villa_snapshot v on v.uuid = s.villa_uuid
+              ${v.data}->'photos' as photos, exists (select 1 from villa_sale x where x.villa_uuid = s.villa_uuid) as has_listing
+         from villa_sale_status s ${v.joins}
         where s.removed_at is null and replace(s.villa_uuid::text, '-', '') like $1
         limit 2`,
       [`${m[1].toLowerCase()}%`],
