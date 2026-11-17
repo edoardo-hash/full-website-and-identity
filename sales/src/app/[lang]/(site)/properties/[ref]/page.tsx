@@ -6,7 +6,7 @@ import { isLicensed, matchRequest } from "@/lib/rules";
 import { fmt, href, isLang, type Lang } from "@/lib/i18n";
 import { getDict, translateText } from "@/lib/i18n/translate";
 import { FEATURE_GROUPS, FEATURES, featureText } from "@/lib/features";
-import { Arrow, DAVID, DbNotice, ExpertCard, Icon, ListingCard, listingPrice, listingTitle, SiteFooter, SiteHeader, Specs, whatsapp } from "@/components/site";
+import { Arrow, DAVID, isApartment, DbNotice, ExpertCard, Icon, ListingCard, listingPrice, listingTitle, SiteFooter, SiteHeader, Specs, whatsapp } from "@/components/site";
 import { Gallery } from "@/components/gallery";
 import { submitEnquiry } from "@/app/actions";
 
@@ -123,7 +123,7 @@ export default async function Property({ params, searchParams }: { params: Param
 
               <section className="villa-section">
                 <h2>{P.checkedTitle}</h2>
-                <p className="muted" style={{ fontSize: 14, marginBottom: 18 }}>{P.checkedLead}</p>
+                <p className="muted" style={{ fontSize: 14, marginBottom: 18 }}>{isApartment(l) ? P.checkedLeadApartment : P.checkedLead}</p>
                 <ul className="doc-list">{[P.checked1, P.checked2, P.checked3, P.checked4, P.checked5, P.checked6].map((x) => <li key={x}><Icon.tick /><span>{x}</span></li>)}</ul>
               </section>
 

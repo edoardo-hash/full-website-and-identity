@@ -174,7 +174,12 @@ export function SiteFooter({ t, lang }: { t: Dict; lang: Lang }) {
 }
 
 /** Sales cards show the reference and the area, never the villa's name. */
-export const listingTitle = (t: Dict, l: Listing) => (l.bedrooms ? fmt(t.card.titleBeds, { beds: l.bedrooms, area: l.area }) : fmt(t.card.title, { area: l.area }));
+/** An apartment is always named as one, never as a villa (Edo, 17 Nov 2026). */
+export const isApartment = (l: Pick<Listing, "propertyType">) => l.propertyType === "apartment";
+export const listingTitle = (t: Dict, l: Listing) => {
+  const apt = isApartment(l);
+  return l.bedrooms ? fmt(apt ? t.card.titleBedsApartment : t.card.titleBeds, { beds: l.bedrooms, area: l.area }) : fmt(apt ? t.card.titleApartment : t.card.title, { area: l.area });
+};
 export const listingPrice = (t: Dict, l: Listing) => (l.priceOnRequest || l.askingPrice === null ? t.card.priceOnRequest : eur(l.askingPrice));
 const m2 = (n: number) => `${Math.round(n).toLocaleString("en-GB")} m²`;
 
