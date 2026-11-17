@@ -211,15 +211,15 @@ async function load<T>(fn: () => Promise<T>): Promise<Loaded<T>> {
 export const allListings = () => load(async () => withFeatures((await q<Row>(`${await listingSql()} order by vs.updated_at desc`)).map(toListing)));
 
 /**
- * The public site: approved or under offer, not off-market, Invenio Homes brand only
- * (IH and LV never mix on one site).
+ * The public site: approved or under offer, not off-market. The tourist licence plays no part in sales (Edo,
+ * 17 Nov 2026: "licenza o non licenza non c'entra niente, si possono far vedere tutte le ville") — the Invenio Homes /
+ * Lila Villas split is for rentals only, so there is no brand filter here.
  */
 export const publicListings = () =>
   load(async () =>
     withFeatures(
       (await q<Row>(`${await listingSql()} and vs.status in ('approved', 'under_offer') and not vs.off_market and ${VILLAS_ONLY} order by vs.asking_price_eur nulls last`))
         .map(toListing)
-        .filter((l) => l.brand === "IH")
         // The public site never gets villa names: not as fields, not inside the sale text (Edo, 1 Nov 2026).
         .map((l) => ({ ...l, publicSummary: scrubVillaNames(l.publicSummary, [l.invenioName, l.realName]) ?? null, invenioName: null, realName: null })),
     ),
