@@ -137,7 +137,7 @@ export default async function Property({ params, searchParams }: { params: Param
                 <h2>{P.goodToKnow}</h2>
                 <dl className="fact-grid">
                   <div className="fact"><dt>{P.reference}</dt><dd>{l.ref}</dd></div>
-                  <div className="fact"><dt>{P.touristLicence}</dt><dd>{licensed ? (l.licenceTransferable ? P.licenceTransferable : P.yes) : P.noLicence}</dd></div>
+                  {licensed ? <div className="fact"><dt>{P.touristLicence}</dt><dd>{l.licenceTransferable ? P.licenceTransferable : P.yes}</dd></div> : null}
                   {l.legalBedrooms && l.legalBedrooms !== l.bedrooms ? <div className="fact"><dt>{P.bedroomsLegal}</dt><dd>{fmt(P.bedroomsLegalText, { legal: l.legalBedrooms, described: l.bedrooms })}</dd></div> : null}
                   <div className="fact"><dt>{P.rented}</dt><dd>{l.rentableWhileOnSale === null ? P.askUs : l.rentableWhileOnSale ? P.rentedYes : P.no}</dd></div>
                   <div className="fact"><dt>{P.viewings}</dt><dd>{P.viewingsText}</dd></div>
@@ -180,7 +180,7 @@ export default async function Property({ params, searchParams }: { params: Param
                   <div><span>{P.status}</span><strong>{status}</strong></div>
                   <div><span>{P.bedrooms}</span><strong>{l.legalBedrooms ?? l.bedrooms}</strong></div>
                   <div><span>{P.bathrooms}</span><strong>{l.bathrooms}</strong></div>
-                  <div><span>{P.touristLicence}</span><strong>{licensed ? P.yes : P.no}</strong></div>
+                  {licensed ? <div><span>{P.touristLicence}</span><strong>{P.yes}</strong></div> : null}
                 </div>
                 <form id="enquire" action={submitEnquiry} className="panel-form"><div className="hp" aria-hidden="true"><label>Website<input name="website" tabIndex={-1} autoComplete="off" /></label></div>
                   {sp.error ? <p className="note-err" role="alert">{t.brief.error}</p> : null}

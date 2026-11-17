@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import type { Listing } from "@/lib/data";
 import type { Dict } from "@/lib/i18n/en";
 import { fmt, href, LANG_NAMES, LANGS, type Lang } from "@/lib/i18n";
-import { eur } from "@/lib/rules";
+import { eur, isLicensed } from "@/lib/rules";
 import { SiteBehaviour } from "./site-behaviour";
 
 /** The rentals site this one is the sales arm of (the v2 company site while it is on Vercel, inveniohomes.com after). */
@@ -178,17 +178,22 @@ export const listingTitle = (t: Dict, l: Listing) => (l.bedrooms ? fmt(t.card.ti
 export const listingPrice = (t: Dict, l: Listing) => (l.priceOnRequest || l.askingPrice === null ? t.card.priceOnRequest : eur(l.askingPrice));
 const m2 = (n: number) => `${Math.round(n).toLocaleString("en-GB")} m²`;
 
-/** The facts strip under a listing: bedrooms, bathrooms, built, plot (what is known). */
+/**
+ * The facts strip under a listing: bedrooms, bathrooms, built, plot (what is known), and "Tourist licence" when the
+ * house has one — a selling point, said on every card, never with the number; a house without one says nothing
+ * (Edo, 17 Nov 2026).
+ */
 export function Specs({ t, l, licence }: { t: Dict; l: Listing; licence?: string | null }) {
   const P = t.property;
   const beds = l.legalBedrooms ?? l.bedrooms;
+  const licenceText = licence ?? (isLicensed(l.licence) ? P.touristLicence : null);
   return (
     <div className="spec-bar property-specs">
       {beds ? <span className="spec"><Icon.bed /> {beds} {P.bedrooms.toLowerCase()}</span> : null}
       {l.bathrooms ? <span className="spec"><Icon.bath /> {l.bathrooms} {P.bathrooms.toLowerCase()}</span> : null}
       {l.builtM2 ? <span className="spec"><Icon.built /> {m2(l.builtM2)} {P.built.toLowerCase()}</span> : null}
       {l.plotM2 ? <span className="spec"><Icon.plot /> {m2(l.plotM2)} {P.plot.toLowerCase()}</span> : null}
-      {licence ? <span className="spec"><Icon.licence /> {licence}</span> : null}
+      {licenceText ? <span className="spec"><Icon.licence /> {licenceText}</span> : null}
     </div>
   );
 }
