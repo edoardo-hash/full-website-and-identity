@@ -70,7 +70,7 @@ export default async function ListingPage({ params, searchParams }: { params: Pa
               <div className="kv"><span>Exclusive agent elsewhere</span><span>{l.exclusiveAgent ?? "—"}</span></div>
               <div className="kv"><span>Built / plot</span><span>{l.builtM2 ? `${l.builtM2} m²` : "—"} / {l.plotM2 ? `${l.plotM2} m²` : "—"}</span></div>
               <div className="kv"><span>Cadastral reference</span><span>{l.cadastralRef ?? "—"}</span></div>
-              <div className="kv"><span>Tourist licence</span><span>{isLicensed(l.licence) ? `${l.licence}${l.licenceTransferable ? " · transferable" : ""}` : "None"}</span></div>
+              <div className="kv"><span>Tourist licence</span><span>{isLicensed(l.licence) ? l.licence : "None"}</span></div>
               <div className="kv"><span>Exposure</span><span>{[l.offMarket && "Off-market", l.websiteOnly && "Website only", l.rentableWhileOnSale && "Rentable while on sale"].filter(Boolean).join(" · ") || "Website and portals"}</span></div>
               {l.notes ? <div className="kv"><span>Staff notes</span><span style={{ textAlign: "right", maxWidth: "60ch" }}>{l.notes}</span></div> : null}
             </div>

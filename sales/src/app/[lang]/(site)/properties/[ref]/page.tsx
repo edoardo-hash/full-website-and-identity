@@ -53,7 +53,7 @@ export default async function Property({ params, searchParams }: { params: Param
   const licensed = isLicensed(l.licence);
   const title = listingTitle(t, l);
   const status = l.status === "under_offer" ? P.underOffer : P.forSale;
-  const licenceLine = licensed ? `${P.touristLicence}: ${(l.licenceTransferable ? P.licenceTransferable : P.yes).toLowerCase()}` : null;
+  const licenceLine = licensed ? `${P.touristLicence}: ${P.yes.toLowerCase()}` : null;
   // Yes only: a buyer sees what the home has, never a list of "no".
   const featureGroups = FEATURE_GROUPS.map((g) => ({
     g,
@@ -137,7 +137,7 @@ export default async function Property({ params, searchParams }: { params: Param
                 <h2>{P.goodToKnow}</h2>
                 <dl className="fact-grid">
                   <div className="fact"><dt>{P.reference}</dt><dd>{l.ref}</dd></div>
-                  {licensed ? <div className="fact"><dt>{P.touristLicence}</dt><dd>{l.licenceTransferable ? P.licenceTransferable : P.yes}</dd></div> : null}
+                  {licensed ? <div className="fact"><dt>{P.touristLicence}</dt><dd>{P.yes}</dd></div> : null}
                   {l.legalBedrooms && l.legalBedrooms !== l.bedrooms ? <div className="fact"><dt>{P.bedroomsLegal}</dt><dd>{fmt(P.bedroomsLegalText, { legal: l.legalBedrooms, described: l.bedrooms })}</dd></div> : null}
                   <div className="fact"><dt>{P.rented}</dt><dd>{l.rentableWhileOnSale === null ? P.askUs : l.rentableWhileOnSale ? P.rentedYes : P.no}</dd></div>
                   <div className="fact"><dt>{P.viewings}</dt><dd>{P.viewingsText}</dd></div>
