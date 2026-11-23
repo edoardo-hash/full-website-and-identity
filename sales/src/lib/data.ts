@@ -168,18 +168,61 @@ async function withFeatures(list: Listing[]): Promise<Listing[]> {
  * is the fallback; where the replica isn't there (production) only the import is read. Asked once per server instance.
  */
 let replica: Promise<boolean> | null = null;
-const hasReplica = () =>
-  (replica ??= q<{ has: boolean }>("select to_regclass('dev_src.villa_snapshot') is not null as has")
+let replicaAskedAt = 0;
+/**
+ * A failed or negative answer is asked again after a minute, never kept for the life of the instance: one slow first
+ * query (cold start) left an instance reading the old import only, so 4 of David's listings showed "Villa in Ibiza",
+ * 0 bedrooms and no photo (23 Nov 2026) while the next instance showed them right.
+ */
+const hasReplica = () => {
+  if (!replica || Date.now() - replicaAskedAt > 60_000) {
+    replicaAskedAt = Date.now();
+    const asked = q<{ has: boolean }>("select to_regclass('dev_src.villa_snapshot') is not null as has")
+      .then((r) => !!r[0]?.has)
+      .catch(() => false);
+    replica = asked.then((has) => {
+      if (has) replicaAskedAt = Number.POSITIVE_INFINITY; // a yes is kept
+      return has;
+    });
+  }
+  return replica;
+};
+
+/**
+ * A property still being prepared in the portal (its `property_draft`, not yet in IMpulse's feed): the Sarana flats and
+ * penthouse (23 Nov 2026) showed "Apartment in Ibiza", no photo and no bathrooms. Its own record is built from the draft:
+ * area, district, counts, approximate point, licence, names (only to scrub them) and its photos, served by
+ * /api/draft-photo/<id> (this app's route, public only while the listing is). Open drafts and drafts sent to IMpulse;
+ * once the villa is in the feed, the feed's record wins.
+ */
+const DRAFT_JOIN = (idExpr: string) =>
+  `left join property_draft pd on pd.uuid = ${idExpr} and pd.status in ('DRAFT', 'SUBMITTED')`;
+const DRAFT_DATA = `case when pd.id is null then null else jsonb_build_object(
+    'area', pd.data->'area', 'district', pd.data->'district', 'bedrooms', pd.data->'bedrooms', 'bathrooms', pd.data->'bathrooms',
+    'approxGps', pd.data->'approxGps', 'licence', pd.data->'licence', 'uniqueName', pd.data->'uniqueName',
+    'originalName', pd.data->'originalName',
+    'photos', coalesce((select jsonb_agg('/api/draft-photo/' || ph.id order by ph.position, ph.id)
+                          from property_draft_photo ph where ph.draft_id = pd.id and ph.deleted_at is null), '[]'::jsonb)) end`;
+
+let drafts: Promise<boolean> | null = null;
+const hasDrafts = () =>
+  (drafts ??= q<{ has: boolean }>("select to_regclass('public.property_draft_photo') is not null and to_regclass('public.property_draft') is not null as has")
     .then((r) => !!r[0]?.has)
-    .catch(() => false));
+    .catch(() => {
+      drafts = null; // asked again next time
+      return false;
+    }));
+
 /** The joins and the expression giving one villa's record, for a query whose villa id is `idExpr`. */
 async function villaRecord(idExpr: string): Promise<{ joins: string; data: string }> {
-  return (await hasReplica())
-    ? {
-        joins: `left join dev_src.villa_snapshot vd on vd.uuid = ${idExpr} left join villa_snapshot vp on vp.uuid = ${idExpr}`,
-        data: "coalesce(vd.data, vp.data)",
-      }
-    : { joins: `left join villa_snapshot vp on vp.uuid = ${idExpr}`, data: "vp.data" };
+  const [rep, dr] = await Promise.all([hasReplica(), hasDrafts()]);
+  const joins = [
+    rep ? `left join dev_src.villa_snapshot vd on vd.uuid = ${idExpr}` : "",
+    `left join villa_snapshot vp on vp.uuid = ${idExpr}`,
+    dr ? DRAFT_JOIN(idExpr) : "",
+  ].filter(Boolean).join(" ");
+  const parts = [rep ? "vd.data" : "", "vp.data", dr ? DRAFT_DATA : ""].filter(Boolean);
+  return { joins, data: parts.length > 1 ? `coalesce(${parts.join(", ")})` : parts[0] };
 }
 
 const listingSql = async () => {
