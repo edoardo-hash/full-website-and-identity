@@ -41,6 +41,8 @@ export const EN = {
     title: "Villa in {area}",
     titleBedsApartment: "{beds}-bedroom apartment in {area}",
     titleApartment: "Apartment in {area}",
+    titlePlot: "Plot in {area}",
+    titlePlotLicence: "Plot with building licence in {area}",
     priceOnRequest: "Price on request",
     view: "View property",
     underOffer: "Under offer",

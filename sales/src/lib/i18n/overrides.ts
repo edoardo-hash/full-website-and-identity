@@ -9,6 +9,9 @@ export const OVERRIDES: Partial<Record<Lang, Record<string, string>>> = {
     // 17 Nov 2026: apartments are shown too, always named as apartments.
     "card.titleBedsApartment": "Appartement met {beds} slaapkamers in {area}",
     "card.titleApartment": "Appartement in {area}",
+    // 24 Nov 2026: plots are shown too (David #399).
+    "card.titlePlot": "Perceel in {area}",
+    "card.titlePlotLicence": "Perceel met bouwvergunning in {area}",
     "property.checkedLeadApartment": "Ons verkoopteam heeft deze gecontroleerd voordat dit appartement te koop werd aangeboden.",
     // 1 Nov 2026: the model split the emphasis in two ("*van binnen* *bekend*"); one accent, as in the other languages.
     "home.title": "Villa's te koop in Ibiza, van binnen *bekend*.",
@@ -16,6 +19,8 @@ export const OVERRIDES: Partial<Record<Lang, Record<string, string>>> = {
   es: {
     "card.titleBedsApartment": "Apartamento de {beds} dormitorios en {area}",
     "card.titleApartment": "Apartamento en {area}",
+    "card.titlePlot": "Parcela en {area}",
+    "card.titlePlotLicence": "Parcela con licencia de obra en {area}",
     "property.checkedLeadApartment": "Nuestro equipo comercial revisó estos puntos antes de que este apartamento saliera a la venta.",
     // 1 Nov 2026: one verb on both brief buttons.
     "brief.send": "Envíe su brief",
@@ -23,6 +28,8 @@ export const OVERRIDES: Partial<Record<Lang, Record<string, string>>> = {
   it: {
     "card.titleBedsApartment": "Appartamento con {beds} camere da letto a {area}",
     "card.titleApartment": "Appartamento a {area}",
+    "card.titlePlot": "Terreno a {area}",
+    "card.titlePlotLicence": "Terreno con licenza edilizia a {area}",
     "property.checkedLeadApartment": "Il nostro team commerciale ha esaminato questi aspetti prima che questo appartamento fosse messo in vendita.",
     // 1 Nov 2026 (design critique): the model wrote "Invi"; one wording on both brief buttons.
     "nav.sendBrief": "Invii la Sua richiesta",

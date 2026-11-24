@@ -176,10 +176,15 @@ export function SiteFooter({ t, lang }: { t: Dict; lang: Lang }) {
 /** Sales cards show the reference and the area, never the villa's name. */
 /** An apartment is always named as one, never as a villa (Edo, 17 Nov 2026). */
 export const isApartment = (l: Pick<Listing, "propertyType">) => l.propertyType === "apartment";
-export const listingTitle = (t: Dict, l: Listing) => {
+export const isPlot = (l: Pick<Listing, "propertyType">) => l.propertyType === "plot" || l.propertyType === "plot_licence";
+/** The generic title: "5-bedroom villa in Cala Jondal", "Apartment in …", "Plot in …". */
+export const genericTitle = (t: Dict, l: Listing) => {
+  if (isPlot(l)) return fmt(l.propertyType === "plot_licence" ? t.card.titlePlotLicence : t.card.titlePlot, { area: l.area });
   const apt = isApartment(l);
   return l.bedrooms ? fmt(apt ? t.card.titleBedsApartment : t.card.titleBeds, { beds: l.bedrooms, area: l.area }) : fmt(apt ? t.card.titleApartment : t.card.title, { area: l.area });
 };
+/** The headline: the villa's own tagline from the portal when it has one (David #381, Edo 24 Nov 2026), else the generic title. */
+export const listingTitle = (t: Dict, l: Listing) => l.tagline || genericTitle(t, l);
 export const listingPrice = (t: Dict, l: Listing) => (l.priceOnRequest || l.askingPrice === null ? t.card.priceOnRequest : eur(l.askingPrice));
 const m2 = (n: number) => `${Math.round(n).toLocaleString("en-GB")} m²`;
 

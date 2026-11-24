@@ -18,6 +18,11 @@ export interface Listing extends MatchListing {
   offMarket: boolean;
   /** Villa or apartment (Edo, 17 Nov 2026): the public site shows both and says which; the portal has more types. */
   propertyType: string;
+  /**
+   * The villa's tagline from the portal (Information tab; the newest portal edit wins over the feed's, so what the head
+   * of sales types shows at once): the listing's headline (David #381, Edo 24 Nov 2026). Null = the generic title.
+   */
+  tagline: string | null;
   websiteOnly: boolean;
   negotiable: boolean | null;
   commissionPct: number | null;
@@ -68,6 +73,7 @@ interface Row {
   uuid: string;
   status: string;
   property_type: string | null;
+  tagline_edit: string | null;
   price: string | null;
   price_on_request: boolean;
   negotiable: boolean | null;
@@ -125,6 +131,7 @@ function toListing(r: Row): Listing {
     rentableWhileOnSale: r.rentable_while_on_sale,
     offMarket: r.off_market,
     propertyType: r.property_type ?? "villa",
+    tagline: (r.tagline_edit ?? str(v.tagline))?.trim() || null,
     websiteOnly: r.website_only,
     negotiable: r.negotiable,
     commissionPct: num(r.commission_pct),
@@ -200,7 +207,7 @@ const DRAFT_JOIN = (idExpr: string) =>
 const DRAFT_DATA = `case when pd.id is null then null else jsonb_build_object(
     'area', pd.data->'area', 'district', pd.data->'district', 'bedrooms', pd.data->'bedrooms', 'bathrooms', pd.data->'bathrooms',
     'approxGps', pd.data->'approxGps', 'licence', pd.data->'licence', 'uniqueName', pd.data->'uniqueName',
-    'originalName', pd.data->'originalName',
+    'originalName', pd.data->'originalName', 'tagline', pd.data->'tagline',
     'photos', coalesce((select jsonb_agg('/api/draft-photo/' || ph.id order by ph.position, ph.id)
                           from property_draft_photo ph where ph.draft_id = pd.id and ph.deleted_at is null), '[]'::jsonb)) end`;
 
@@ -228,7 +235,9 @@ async function villaRecord(idExpr: string): Promise<{ joins: string; data: strin
 const listingSql = async () => {
   const v = await villaRecord("vs.villa_uuid");
   return `
-  select ${v.data} as v, vs.villa_uuid::text as uuid, vs.status, to_jsonb(vs)->>'property_type' as property_type, vs.asking_price_eur::text as price, vs.price_on_request, vs.negotiable,
+  select ${v.data} as v, vs.villa_uuid::text as uuid, vs.status, to_jsonb(vs)->>'property_type' as property_type,
+         (select e.new_value #>> '{}' from villa_edit e where e.villa_uuid = vs.villa_uuid and e.field = 'tagline' order by e.edited_at desc limit 1) as tagline_edit,
+         vs.asking_price_eur::text as price, vs.price_on_request, vs.negotiable,
          vs.commission_pct::text, vs.mandate_type, vs.mandate_signed_on::text, vs.mandate_ends_on::text, vs.listing_partner,
          vs.exclusive_agent, vs.off_market, vs.rentable_while_on_sale, vs.website_only, vs.legal_bedrooms, vs.built_m2::text,
          vs.plot_m2::text, vs.cadastral_ref, vs.licence_transferable, vs.public_summary, vs.notes, vs.approved_by, vs.updated_at::text
@@ -238,12 +247,13 @@ const listingSql = async () => {
 };
 
 /**
- * Villas and apartments (Edo, 17 Nov 2026; villas only from 13 Nov): the portal's villa_sale.property_type (its
- * migrations 094 / 095), read through to_jsonb so the query still runs on a database where the column isn't there yet.
- * An apartment is always shown as an apartment, never as a villa (listingTitle in components/site.tsx). The other
- * types (townhouse, plots, hotel, commercial) stay in the portal.
+ * Villas, apartments and plots (Edo, 24 Nov 2026, David #399: plots too, each decided by its own "Off market" switch;
+ * villas and apartments from 17 Nov, villas only from 13 Nov): the portal's villa_sale.property_type (its migrations
+ * 094 / 095), read through to_jsonb so the query still runs on a database where the column isn't there yet. An
+ * apartment is always shown as an apartment and a plot as a plot, never as a villa (listingTitle in
+ * components/site.tsx). The other types (townhouse, hotel, commercial) stay in the portal.
  */
-export const PUBLIC_TYPES = ["villa", "apartment"];
+export const PUBLIC_TYPES = ["villa", "apartment", "plot", "plot_licence"];
 const PUBLIC_TYPES_SQL = `coalesce(to_jsonb(vs)->>'property_type', 'villa') in (${PUBLIC_TYPES.map((t) => `'${t}'`).join(", ")})`;
 
 export type Loaded<T> = { ok: true; data: T } | { ok: false; reason: "no-db" | "error"; message?: string };
@@ -271,7 +281,7 @@ export const publicListings = () =>
       (await q<Row>(`${await listingSql()} and vs.status in ('approved', 'under_offer') and not vs.off_market and ${PUBLIC_TYPES_SQL} order by vs.asking_price_eur nulls last`))
         .map(toListing)
         // The public site never gets villa names: not as fields, not inside the sale text (Edo, 1 Nov 2026).
-        .map((l) => ({ ...l, publicSummary: scrubVillaNames(l.publicSummary, [l.invenioName, l.realName]) ?? null, invenioName: null, realName: null })),
+        .map((l) => ({ ...l, publicSummary: scrubVillaNames(l.publicSummary, [l.invenioName, l.realName]) ?? null, tagline: scrubVillaNames(l.tagline, [l.invenioName, l.realName]) ?? null, invenioName: null, realName: null })),
     ),
   );
 
