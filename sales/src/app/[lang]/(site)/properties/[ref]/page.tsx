@@ -6,7 +6,7 @@ import { isLicensed, matchRequest } from "@/lib/rules";
 import { fmt, href, isLang, type Lang } from "@/lib/i18n";
 import { getDict, translateText } from "@/lib/i18n/translate";
 import { FEATURE_GROUPS, FEATURES, featureText } from "@/lib/features";
-import { Arrow, DAVID, isApartment, DbNotice, ExpertCard, Icon, ListingCard, listingPrice, listingTitle, SiteFooter, SiteHeader, Specs, whatsapp } from "@/components/site";
+import { Arrow, DAVID, isApartment, isPlot, DbNotice, ExpertCard, Icon, ListingCard, listingPrice, listingTitle, SiteFooter, SiteHeader, Specs, whatsapp } from "@/components/site";
 import { Gallery } from "@/components/gallery";
 import { submitEnquiry } from "@/app/actions";
 
@@ -178,8 +178,8 @@ export default async function Property({ params, searchParams }: { params: Param
                 <div className="panel-price"><strong>{hidePrice ? P.onRequest : listingPrice(t, l)}</strong><span>{status}</span></div>
                 <div className="panel-rows">
                   <div><span>{P.status}</span><strong>{status}</strong></div>
-                  <div><span>{P.bedrooms}</span><strong>{l.legalBedrooms ?? l.bedrooms}</strong></div>
-                  <div><span>{P.bathrooms}</span><strong>{l.bathrooms}</strong></div>
+                  {isPlot(l) ? null : <div><span>{P.bedrooms}</span><strong>{l.legalBedrooms ?? l.bedrooms}</strong></div>}
+                  {isPlot(l) ? null : <div><span>{P.bathrooms}</span><strong>{l.bathrooms}</strong></div>}
                   {licensed ? <div><span>{P.touristLicence}</span><strong>{P.yes}</strong></div> : null}
                 </div>
                 <form id="enquire" action={submitEnquiry} className="panel-form"><div className="hp" aria-hidden="true"><label>Website<input name="website" tabIndex={-1} autoComplete="off" /></label></div>

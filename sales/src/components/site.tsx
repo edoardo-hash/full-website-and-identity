@@ -195,12 +195,15 @@ const m2 = (n: number) => `${Math.round(n).toLocaleString("en-GB")} m²`;
  */
 export function Specs({ t, l, licence }: { t: Dict; l: Listing; licence?: string | null }) {
   const P = t.property;
-  const beds = l.legalBedrooms ?? l.bedrooms;
+  // A plot has no rooms: the portal's villa record still carries 1 / 1 for it (V-0e4dc5, 25 Nov 2026).
+  const plot = isPlot(l);
+  const beds = plot ? 0 : l.legalBedrooms ?? l.bedrooms;
+  const baths = plot ? 0 : l.bathrooms;
   const licenceText = licence ?? (isLicensed(l.licence) ? P.touristLicence : null);
   return (
     <div className="spec-bar property-specs">
       {beds ? <span className="spec"><Icon.bed /> {beds} {P.bedrooms.toLowerCase()}</span> : null}
-      {l.bathrooms ? <span className="spec"><Icon.bath /> {l.bathrooms} {P.bathrooms.toLowerCase()}</span> : null}
+      {baths ? <span className="spec"><Icon.bath /> {baths} {P.bathrooms.toLowerCase()}</span> : null}
       {l.builtM2 ? <span className="spec"><Icon.built /> {m2(l.builtM2)} {P.built.toLowerCase()}</span> : null}
       {l.plotM2 ? <span className="spec"><Icon.plot /> {m2(l.plotM2)} {P.plot.toLowerCase()}</span> : null}
       {licenceText ? <span className="spec"><Icon.licence /> {licenceText}</span> : null}
@@ -253,8 +256,8 @@ export function ListingCard({ t, lang, l, as: H = "h3" }: { t: Dict; lang: Lang;
             <span className="villa-card__area">{l.area}</span>
           </div>
           <div className="villa-card__meta">
-            <span>{l.legalBedrooms ?? l.bedrooms} {t.property.bedrooms.toLowerCase()}</span>
-            <span>{l.bathrooms} {t.property.bathrooms.toLowerCase()}</span>
+            {isPlot(l) ? null : <span>{l.legalBedrooms ?? l.bedrooms} {t.property.bedrooms.toLowerCase()}</span>}
+            {isPlot(l) ? null : <span>{l.bathrooms} {t.property.bathrooms.toLowerCase()}</span>}
             {l.plotM2 ? <span>{m2(l.plotM2)} {t.property.plot.toLowerCase()}</span> : null}
           </div>
           <div className="villa-card__price"><strong>{listingPrice(t, l)}</strong></div>

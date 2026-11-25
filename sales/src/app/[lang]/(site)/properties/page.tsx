@@ -4,7 +4,7 @@ import { publicListings } from "@/lib/data";
 import { MUST_HAVES } from "@/lib/rules";
 import { fmt, href, isLang, type Lang } from "@/lib/i18n";
 import { getDict } from "@/lib/i18n/translate";
-import { DbNotice, ExpertCard, Icon, ListingRow, SiteFooter, SiteHeader } from "@/components/site";
+import { DbNotice, ExpertCard, Icon, isPlot, ListingRow, SiteFooter, SiteHeader } from "@/components/site";
 import { BriefForm } from "@/components/brief-form";
 import { MustHaveChips } from "@/components/must-haves";
 import { FEW_LISTINGS } from "@/lib/catalogue";
@@ -41,7 +41,7 @@ export default async function Properties({ params, searchParams }: { params: Par
   let list = all.filter(
     (l) =>
       (!area || l.area === area) &&
-      (!beds || (l.legalBedrooms ?? l.bedrooms) >= beds) &&
+      (!beds || (!isPlot(l) && (l.legalBedrooms ?? l.bedrooms) >= beds)) &&
       (lo === null || lo === undefined || (l.askingPrice ?? Infinity) >= lo) &&
       (hi === null || hi === undefined || (l.askingPrice ?? 0) <= hi) &&
       must.every((m) => m.match(l)),
