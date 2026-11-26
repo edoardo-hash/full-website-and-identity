@@ -202,3 +202,21 @@
     .catch(function (e) { if (window.console) console.info("stats: keeping the figures in the page", e && e.name); })
     .then(function () { clearTimeout(timer); done(); });
 })();
+
+/* Featured villas (Edo, 26 Nov 2026): only villas published AND with "API" on in IMpulse are shown. A home card whose
+   villa no longer is disappears; its villa page sends the visitor to the home page. No answer = nothing changes. */
+(() => {
+  "use strict";
+  const cards = [...document.querySelectorAll(".home-card[data-villa]")];
+  const page = document.querySelector("script[data-villa]");
+  const ids = [...new Set([...cards.map((c) => c.dataset.villa), page?.dataset.villa].filter(Boolean))];
+  if (!ids.length || typeof fetch !== "function") return;
+  fetch(`/api/villa-status/?ids=${ids.join(",")}`)
+    .then((r) => (r.ok ? r.json() : null))
+    .then((j) => {
+      if (!j || !j.ok || !j.show) return;
+      cards.forEach((c) => { if (j.show[c.dataset.villa] === false) c.remove(); });
+      if (page && j.show[page.dataset.villa] === false) location.replace("/");
+    })
+    .catch(() => {});
+})();

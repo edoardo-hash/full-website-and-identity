@@ -58,5 +58,17 @@
         }
       ]
     }
+  ],
+  "redirects": [
+    {
+      "source": "/villas/villa-alyssa/",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/villas/villa-bailey/",
+      "destination": "/",
+      "permanent": false
+    }
   ]
 }
