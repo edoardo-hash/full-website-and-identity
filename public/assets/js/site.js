@@ -225,7 +225,7 @@
   }, force ? 300 : 1400);
 })();
 
-/* Featured villas (Edo, 26 Nov 2026): only villas published AND with "API" on in IMpulse are shown. A home card whose
+/* Featured villas (Edo, 26 Nov 2026): only villas with "API" on in IMpulse and published in the last 180 days are shown. A home card whose
    villa no longer is disappears; its villa page sends the visitor to the home page. No answer = nothing changes. */
 (() => {
   "use strict";

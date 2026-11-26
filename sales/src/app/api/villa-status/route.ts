@@ -2,7 +2,8 @@ import { hasDb, q } from "@/lib/db";
 
 /**
  * Which of the company site's featured villas may be shown (Edo, 26 Nov 2026: "all villas appearing there are published
- * and have API ON"): published in IMpulse AND the "API" switch on (`invenio.villa.api_enabled`). Answers only yes / no
+ * and have API ON"; later the same day: "have all been published in the last 180 days"): the "API" switch on
+ * (`invenio.villa.api_enabled`) AND published now or unpublished less than 180 days ago (`unpublished_at`). Answers only yes / no
  * per id; ids that aren't villas are simply "no". Public, no villa data.
  */
 export const revalidate = 3600;
@@ -15,7 +16,7 @@ export async function GET(req: Request) {
   if (!hasDb()) return Response.json({ ok: false, error: "No database connected" }, { status: 503 });
   try {
     const rows = await q<{ id: string; show: boolean }>(
-      `select bp_uuid::text as id, (coalesce(published, false) and coalesce(api_enabled, false)) as show
+      `select bp_uuid::text as id, (coalesce(api_enabled, false) and (coalesce(published, false) or unpublished_at > now() - interval '180 days')) as show
          from invenio.villa where bp_uuid::text = any($1::text[])`,
       [ids],
     );

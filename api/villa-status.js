@@ -1,5 +1,5 @@
 /**
- * Which featured villas may be shown on the company site (Edo, 26 Nov 2026): published AND "API" on in IMpulse.
+ * Which featured villas may be shown on the company site (Edo, 26 Nov 2026): "API" on in IMpulse and published in the last 180 days.
  * This project has no database, so it asks the sales site (sales/src/app/api/villa-status), like api/stats.js.
  * VILLA_STATUS_URL overrides the address. When the answer can't be had, nothing is hidden (the pages keep working).
  */
